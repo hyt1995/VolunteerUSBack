@@ -12,7 +12,7 @@ const config = {
         host: "localhost:5002/volunteerUS"
     },
     mysql: {
-        host : "127.0.0.1",
+        host : "54.159.56.75",
         port: "5506",
         user: "korpcRoot",
         password:"Korpcdream21!",
