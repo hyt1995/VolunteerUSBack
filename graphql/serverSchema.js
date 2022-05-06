@@ -279,14 +279,14 @@ const root = {
             // 시작 날짜가 들어오지 않으면 오늘 날짜를 넣어준다.
             if( !info.progrmBeginDate ) {
                 const day = date.format(new Date(), 'YYYYMMDD');
-                whereQuery  = `progrmBeginDate >= ${day}`;
+                whereQuery  = `progrmEndDate > ${day}`;
             } else {
                 // 20220507 형식이 아닐경우 빈배열을 보내준다.
                 if(!info.progrmBeginDate.length === 8){
                     return [];
                 }
                 // 들어온값을 넣어준다.
-                whereQuery  = `progrmBeginDate >= ${info.progrmBeginDate}`;
+                whereQuery  = `progrmEndDate > ${info.progrmBeginDate}`;
             }
 
             // 검색 값이 들어올경우에만 쿼리에 추가한다.
@@ -308,11 +308,11 @@ const root = {
                 }
             };
 
-            pageNumberQuery = info.pageNumber ? (Number(info.pageNumber) -1) * 3 : 0;
+            pageNumberQuery = info.pageNumber ? (Number(info.pageNumber) -1) * 10 : 0;
 
 
             // DB 에서 데이터 불러와서 반환해주기 쿼리
-            const sql = `select * from volunteerInfo where ${whereQuery} limit ? , 3;`;
+            const sql = `select * from volunteerInfo where ${whereQuery} limit ? , 10;`;
 
             let queryValue = [
                 pageNumberQuery

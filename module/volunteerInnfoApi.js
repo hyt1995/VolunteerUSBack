@@ -28,9 +28,9 @@ const lookUpApi = async () => {
         // const endNumber = today !== 7 ?  numberRow * today : numberRow * today + 7
 
         // for 문 시작 
-        const startNumber = 16;
+        const startNumber = 200;
         // for 문 종료
-        const endNumber = 20;
+        const endNumber = 210;
 
         for(let d = startNumber; d <= endNumber; d++){
             // 숫자가 넘어가면 에러 처링
@@ -187,7 +187,7 @@ const modelLookUpApi = async (obj) => {
 };
 
 // 봉사 정보 저장 api
-// lookUpApi();
+lookUpApi();
 
 
 
@@ -245,11 +245,6 @@ const infoLookUp = async ( queryPar ) => {
 };
 
 // infoLookUp();
-
-
-const day = date.format(new Date(), 'YYYYMMDD');
-console.log("오늘 날짜 기준 ::::", day,day.length);
-
 
 
 
