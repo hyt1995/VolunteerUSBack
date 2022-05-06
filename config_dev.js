@@ -13,7 +13,7 @@ const config = {
     },
     mysql: {
         host : "54.159.56.75",
-        port: "5506",
+        port: "3306",
         user: "korpcRoot",
         password:"Korpcdream21!",
         database : "voluntedInfo",

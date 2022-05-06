@@ -8,7 +8,6 @@ const dateTime = require("date-and-time");
 const { bodyParserGraphQL } = require("body-parser-graphql");
 const { graphqlHTTP }  = require('express-graphql');
 const { graphql, buildSchema } = require('graphql');
-const { mergedTypes, mergedResolvers } = require("./shema");
 const { schema, root } = require("./graphql/serverSchema");
 
 const app = express();

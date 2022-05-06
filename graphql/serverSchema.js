@@ -5,6 +5,8 @@ const auth = require("../module/auth");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
+const date = require("date-and-time");
+const { default: axios } = require("axios");
 
 
 
@@ -20,9 +22,41 @@ const schema = buildSchema(`
         token : String
     }
 
+    type InfoVolunteer {
+        registNo : String
+        progrmTitle : String
+        progrmBeginDate : String
+        progrmEndDate : String
+        actBeginTm : String
+        actEndTm : String
+        recruitNunber : Int
+        srvcClcode : String
+        mnnstNm : String
+        postAdres : String
+        adminName : String
+        email : String
+        progrmExpl : String
+        telNo : String
+        actWkdy : String
+        noticeBegin : String
+        noticeEnd : String
+        teenPossible : Int
+        adultPossible : Int
+        groupPossible : Int
+    }
+
     type Query {
         login(id:String! password:String!) : String!
         confirmUserId( id : String! ) : Boolean!
+        infoListResponse(
+            progrmBeginDate : String
+            postAdres : String
+            progrmTitle : String
+            teenPossible : String
+            adultPossible : String
+            groupPossible : String
+            pageNumber : Int
+        ) : [InfoVolunteer]
     }
 
     type Mutation {
@@ -37,12 +71,7 @@ const schema = buildSchema(`
         ) : Boolean!
 
         kakaoUserInfoLogin(
-            id : String! 
-            name : String
-            address : String
-            gender : Boolean
-            birthday : String
-            phone : String
+            token : String!
         ) : User
     }
 
@@ -57,8 +86,6 @@ const root = {
 
         try {
 
-            console.log("넘어온 아이디 확인 :::", id);
-
             // 아이디가 넘어 오지 않았을 경우
             if( !id ){
                 return false
@@ -70,7 +97,6 @@ const root = {
                 id
             ];
             const resultData =  await pool.getData(sql, queryValue);
-            console.log("아이디 조회 결과 :::", resultData);
 
             // 아이디가 없는 경우
             if(!resultData[0][0]){
@@ -102,8 +128,6 @@ const root = {
     createUser : async ( info) => {
 
         try {
-
-            console.log("받아온 회원가입 정보 ::", info);
 
             // 받아온 정보가 부족할 때 
             if ( !info.id || !info.userName || !info.password || !info.phone ) {
@@ -140,8 +164,6 @@ const root = {
                 password,
             ];
             const resultData =  await pool.getData(sql, queryValue);
-
-            console.log("정보 저장 결과확인 :::", resultData);
 
             return true;
 
@@ -180,8 +202,6 @@ const root = {
 
         try {
 
-            console.log("로그인을 위한 정보 확인 ::::",  id, password );
-
             // 아이디 비밀번호가 없을 경우 
             if ( !id || !password){
                 return "false";
@@ -200,8 +220,6 @@ const root = {
             ];
 
             const resultLogin = await pool.getData(sql, queryValue);
-
-            console.log("로그인 결과 확인 :::", resultLogin[0][0]);
 
             if(!resultLogin[0][0]){
                 return "아이디가 없습니다.";
@@ -245,15 +263,85 @@ const root = {
 
         // if(!findId || transPassword !== findId.password) return "일치하는 정보가 없습니다."
     },
+
+
+    // 봉사 정보 리스트 반환
+    infoListResponse : async ( info ) => {
+
+        try {
+
+            // 쿼리 부분
+            let whereQuery = "";
+
+            // 값이 있으면 쿼리에 추가된다.
+            const queryString = ["postAdres", "progrmTitle", "teenPossible", "adultPossible", "groupPossible"];
+
+            // 시작 날짜가 들어오지 않으면 오늘 날짜를 넣어준다.
+            if( !info.progrmBeginDate ) {
+                const day = date.format(new Date(), 'YYYYMMDD');
+                whereQuery  = `progrmBeginDate >= ${day}`;
+            } else {
+                // 20220507 형식이 아닐경우 빈배열을 보내준다.
+                if(!info.progrmBeginDate.length === 8){
+                    return [];
+                }
+                // 들어온값을 넣어준다.
+                whereQuery  = `progrmBeginDate >= ${info.progrmBeginDate}`;
+            }
+
+            // 검색 값이 들어올경우에만 쿼리에 추가한다.
+            for (let n = 0; n < queryString.length; n++){
+
+                const arrayValue = queryString[n];
+
+                // 검색 값이 들어오면 쿼리에 추가해준다.
+                if ( arrayValue === "postAdres" && info[arrayValue] ){
+                    whereQuery += ` and postAdres like "%${info[arrayValue]}%"`;
+                } 
+                // 봉사 제목으로 검색값이 들어왔을 경우
+                else if (arrayValue === "progrmTitle" && info[arrayValue]) {
+                    whereQuery += ` and progrmTitle like "%${info[arrayValue]}%"`;
+                }
+                // 나머지 모집 대상값이 들어왔을 경우
+                else if (info[arrayValue]) {
+                    whereQuery += ` and ${arrayValue} = ${info[arrayValue]}`;
+                }
+            };
+
+            pageNumberQuery = info.pageNumber ? (Number(info.pageNumber) -1) * 3 : 0;
+
+
+            // DB 에서 데이터 불러와서 반환해주기 쿼리
+            const sql = `select * from volunteerInfo where ${whereQuery} limit ? , 3;`;
+
+            let queryValue = [
+                pageNumberQuery
+            ];
+
+            console.log("마지막으로 확인 ::::", sql, queryValue);
+
+            const result = await pool.getData(sql, queryValue);
+
+            console.log("결과값도 같이 ::::", result[0]);
+            return result[0];
+
+
+        } catch ( err ){
+            console.log("여기서 에러 발생 :::", err);
+            return [];
+        };
+
+    },
+
+
+
     // 카카오 로그인 관련
     kakaoUserInfoLogin : async ( info ) => {
 
         try {
 
-            console.log(" 들어온 정보 확인 차 :::: ", info );
-
             // id가 안들어왔을 경우
-            if ( !info.id ) {
+            if ( !info.token ) {
                 return {
                     id : "", 
                     name : "",
@@ -265,10 +353,25 @@ const root = {
                 };
             }
 
+
+            const resultLookUp = await axios.get('https://kapi.kakao.com/v2/user/me',{
+                headers: {
+                    Authorization: `Bearer ${info.token}`,
+                    "Content-type" : "application/x-www-form-urlencoded;charset=utf-8"
+                }
+            });
+
+            console.log("여기서 토큰 확인 ::::", resultLookUp);
+
+            const kakaotalkEmail = await resultLookUp.data.kakao_account.email;
+            const kakaotalkname = await resultLookUp.data.kakao_account.profile.nickname;
+            const kakaoGender = await resultLookUp.data.kakao_account.gender === "male" ? true : false ;
+
+
             // 카카오 로그인으로 정보가 있는지 없는지 확인 절차
             const sql = `SELECT id FROM users WHERE userId = ?;`;
             let queryValue = [
-                info.id
+                kakaotalkEmail
             ];
             const userId = await pool.getData(sql, queryValue);
 
@@ -278,12 +381,12 @@ const root = {
             if(!userId[0][0]){
 
                 return {
-                    id : info.id || "", 
-                    name : info.name || "",
-                    address : info.address || "",
-                    gender : info.gender || false,  // 남자 true, 여자 false
-                    birthday : info.birthday || "", 
-                    phone : info.phone || "",
+                    id : kakaotalkEmail || "", 
+                    name : kakaotalkname || "",
+                    address : "",
+                    gender : kakaoGender || false,  // 남자 true, 여자 false
+                    birthday : "", 
+                    phone : "",
                     token : "",
                 };
 
@@ -294,16 +397,16 @@ const root = {
             let authToken = auth.authToken.member.set({
                 weatherMerber : true,
                 userNum : userId[0][0].id,
-                loginId : info.id
+                loginId : kakaotalkEmail
             });
 
             return {
-                id : info.id || "", 
-                name : info.name || "",
-                address : info.address || "",
-                gender : info.gender || false, // 남자 true, 여자 false
-                birthday : info.birthday || "", 
-                phone : info.phone || "",
+                id : kakaotalkEmail || "", 
+                name : kakaotalkname || "",
+                address :  "",
+                gender : kakaoGender || false, // 남자 true, 여자 false
+                birthday : "", 
+                phone : "",
                 token : authToken || "",
             };
 
