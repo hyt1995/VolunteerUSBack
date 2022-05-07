@@ -338,6 +338,8 @@ const root = {
     // 카카오 로그인 관련
     kakaoUserInfoLogin : async ( info ) => {
 
+        console.log("넘어온 토큰 확인 :::", info);
+
         try {
 
             // id가 안들어왔을 경우
@@ -351,12 +353,26 @@ const root = {
                     phone : "",
                     token : "",
                 };
-            }
+            };
+
+            const kakaRestId = "e98a98f979b43a08c0756c1590d4f028";
+
+            // 받아온 토큰 확인 하기 위한 절차
+            const postAxios = await axios.post(`https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id=${kakaRestId}&redirect_uri=http://localhost:3000/kakao/user&code=${info.token}&client_secret=Y7ZRniW3iS1rpiOjmTl1fWkyJgn5Cg1h`,{
+                headers : {
+                    "Content-type" : "application/x-www-form-urlencoded;charset=utf-8"
+                }
+            });
+
+            const emailcode = postAxios.data.access_token;
+
+            console.log("검증된 토큰 :::", emailcode);
+
 
 
             const resultLookUp = await axios.get('https://kapi.kakao.com/v2/user/me',{
                 headers: {
-                    Authorization: `Bearer ${info.token}`,
+                    Authorization: `Bearer ${emailcode}`,
                     "Content-type" : "application/x-www-form-urlencoded;charset=utf-8"
                 }
             });
