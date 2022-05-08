@@ -63,7 +63,7 @@ const schema = buildSchema(`
         createUser ( 
             id : String! 
             userName : String!
-            password : String! 
+            password : String
             gender : Boolean
             birthday : String
             phone : String!
@@ -130,7 +130,7 @@ const root = {
         try {
 
             // 받아온 정보가 부족할 때 
-            if ( !info.id || !info.userName || !info.password || !info.phone ) {
+            if ( !info.id || !info.userName || !info.phone ) {
 
                 console.log("받아온 정보 부족 :::", info);
                 return false;
@@ -145,7 +145,7 @@ const root = {
             };
 
             // 비밀번호 변경
-            password = crypto.createHash('sha512').update(info.password).digest('base64');
+            password = info.password ? crypto.createHash('sha512').update(info.password).digest('base64') : "";
 
             // 생년월일
             birthday = info.birthday ? String(info.birthday) : "null";
