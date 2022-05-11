@@ -57,6 +57,9 @@ const schema = buildSchema(`
             groupPossible : String
             pageNumber : Int
         ) : [InfoVolunteer]
+        loginTokenAuth(
+            token : String!
+        ) : String!
     }
 
     type Mutation {
@@ -262,6 +265,48 @@ const root = {
         // const transPassword = crypto.createHash('sha512').update(password).digest('base64')
 
         // if(!findId || transPassword !== findId.password) return "일치하는 정보가 없습니다."
+    },
+
+    loginTokenAuth : async ( info, context ) => {
+
+        try {
+
+            // console.log("들어온 토큰 확인 :::", context);
+            // context를 통해 auth에 req.user를 담아서 가져온다. 
+            // req.user가 없으면 접근 불가 처리를 하고 
+            // req.user에 있는 정보로 DB 조회 하고
+            // req.user에 user이름을 추가를 해야한다.
+            // 그래서 프론트에 DB조회를 하지않고 바로 보낼수 있게
+
+            const user = auth.authToken.get(info);
+
+            if(user === false){
+                const error = {
+                    "message": "403", 
+                    "location": 'User info Already exsist',
+                    "stack" : "dkdkdkdkd"
+                  }
+
+                throw new Error(error);
+            }
+
+            console.log("변환된 토큰 확인 :::", user);
+
+            return "토큰 성공적 변환 완료 !!!!";
+        } catch ( err ) {
+            console.log("토큰 로그인 에러 ::::", err);
+            // return {
+            //     code : 0,
+            //     errCode : 404,
+            //     message : "로그인 실패!"
+            // };
+            const error = {
+                "code": "403", 
+                "message": 'User info Already exsist'
+              }
+
+            return new Error(err);
+        }
     },
 
 

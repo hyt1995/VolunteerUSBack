@@ -6,9 +6,11 @@ const { argv } = require("yargs");
 const cron = require("node-cron");
 const dateTime = require("date-and-time");
 const { bodyParserGraphQL } = require("body-parser-graphql");
-const { graphqlHTTP }  = require('express-graphql');
-const { graphql, buildSchema } = require('graphql');
-const { schema, root } = require("./graphql/serverSchema");
+const { ApolloServer, gql } = require('apollo-server-express');
+const { execute, subscribe } = require("graphql");
+// const { schema, root } = require("./graphql/serverSchema");
+const schema = require("./schema");
+const expressPlayground = require('graphql-playground-middleware-express').default
 
 const app = express();
 
@@ -27,21 +29,27 @@ app.use(express.static(path.join(__dirname,"public")));
 
 app.set('view engine', 'html');
 
-// app.use("/graphql", graphqlHTTP({
-//     schema: mergedTypes, 
-//     graphiql: true, 
-//     rootValue: mergedResolvers,
-// }));
 
-app.use("/graphql", graphqlHTTP({
-    schema: schema, 
-    graphiql: true, 
-    rootValue: root,
-}));
+const server = new ApolloServer({
+    schema,
+    // csrfPrevention: true,
+    context : async ({ req, res }) => ({
+      req
+    }),
+    formatError : (err) => { // 에러가 날경우 에러를 리턴 타입과 다르게 보내기 위해 에러 형식을 지정하는 곳입니다.
+      // Don't give the specific errors to the client.
+      if (err.message.startsWith('Database Error: ')) {
+        return new Error('Internal server error');
+      }
+      return err;
+    }
+});
 
 app.get("/",( req, res )=>{
     res.send("5002포트로 들어왔습니다.");
 })
+// express에서 플레이그라운드를 사용하기 위한
+app.get("/playground", expressPlayground({ endpoint: "/graphql" }));
 
 //node ==> deploy.js --mode=dev
 //pm2  ==> pm2 start deploy.js --node-args="deploy.js --mode=dev" --name=mobile_api
@@ -57,11 +65,13 @@ if (argv.mode === "dev") {
     process.env.NODE_ENV = "development";
 }
 
-
-
-app.listen(port, ()=>{
-    console.log(`포트번호 ${port}로 돌아가고 현재 ${process.env.NODE_ENV} 버전입니다.`);
-})
+// 차례차례로 돌아가야한다고 함
+server.start().then(res => {
+    server.applyMiddleware({ app, path: "/graphql" });
+    app.listen(5002, ()=> {
+        console.log(`포트번호 ${port}로 돌아가고 현재 ${process.env.NODE_ENV} 버전입니다.`);
+    })
+  });
 
 
 

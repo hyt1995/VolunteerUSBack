@@ -1,0 +1,32 @@
+type User {
+        id : String
+        name : String
+        address : String
+        gender : Boolean
+        birthday : String
+        phone : String
+        token : String
+    }
+
+    type InfoVolunteer {
+        registNo : String
+        progrmTitle : String
+        progrmBeginDate : String
+        progrmEndDate : String
+        actBeginTm : String
+        actEndTm : String
+        recruitNunber : Int
+        srvcClcode : String
+        mnnstNm : String
+        postAdres : String
+        adminName : String
+        email : String
+        progrmExpl : String
+        telNo : String
+        actWkdy : String
+        noticeBegin : String
+        noticeEnd : String
+        teenPossible : Int
+        adultPossible : Int
+        groupPossible : Int
+    }
