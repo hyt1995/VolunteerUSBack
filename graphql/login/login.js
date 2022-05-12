@@ -11,7 +11,6 @@ module.exports = {
 
             try {
 
-                return "ddddddddd";
 
                 // 아이디 비밀번호가 없을 경우 
                 if ( !id || !password){
@@ -35,7 +34,9 @@ module.exports = {
                 const resultLogin = await pool.getData(sql, queryValue);
 
                 if(!resultLogin[0][0]){
-                    return "아이디가 없습니다.";
+                    throw new ApolloError("아이디가 존재하지 않습니다.", "이상한 아이디", {
+                        message: "id",
+                      });
                 };
 
                 let authToken = auth.authToken.member.set({

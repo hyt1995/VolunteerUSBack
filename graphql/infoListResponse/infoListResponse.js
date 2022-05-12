@@ -1,5 +1,6 @@
 const { ApolloError } = require('apollo-server-errors');
 const pool = require("../../module/mysql2");
+const date = require("date-and-time");
 
 
 module.exports = {
@@ -44,6 +45,7 @@ module.exports = {
                     }
                     // 나머지 모집 대상값이 들어왔을 경우
                     else if (info[arrayValue]) {
+                        console.log("뭐가 들어오는지 :::",arrayValue, info[arrayValue]);
                         whereQuery += ` and ${arrayValue} = ${info[arrayValue]}`;
                     }
                 };
