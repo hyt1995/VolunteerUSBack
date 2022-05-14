@@ -1,0 +1,9 @@
+type Mutation {
+    groupApply (
+        groupName : String!
+        repreName : String!
+        limit : Int!
+        groupGreeting : String!
+        groupExplane : String!
+    ):Boolean!
+}

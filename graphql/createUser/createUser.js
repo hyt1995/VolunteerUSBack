@@ -37,7 +37,7 @@ module.exports = {
                 address = info.address ? info.address : "null";
     
                 // 회원 정보 저장
-                 const sql = `insert into users ( birthday, gender, phoneNumber, userName, userId, password ) values (?, ?, ?, ?, ?, ?) ;`;
+                const sql = `insert into users ( birthday, gender, phoneNumber, userName, userId, password ) values (?, ?, ?, ?, ?, ?) ;`;
                 let queryValue = [
                     birthday,
                     gender,

@@ -1,0 +1,6 @@
+type Mutation {
+    userApplyToGroup (
+        applyGroupName : String
+        applyUserName : String
+    ):Boolean!
+}
