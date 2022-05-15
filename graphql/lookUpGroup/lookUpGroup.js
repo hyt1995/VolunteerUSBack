@@ -11,56 +11,33 @@ module.exports = {
 
             try {
 
-                // 우선 정보가 없으면 에러처리
-                // if (!info.groupName){
-                //     throw new ApolloError("정보를 다시 확인해주세요", "이상한 아이디", {
-                //         message: "id"
-                //     });
-                // };
-                // // 그룹 10개 불러오는데 신청한 사람이 많은 순서대로 불러오기
-                // const sql = `select * from groupInfo left join users on users.id = userVolunteer.userId left join coupon on coupon.userId = users.id where users.id = 3;`;
-                // let queryValue = [
-                //     info.id
-                // ];
-                // const resultData = await pool.getData(sql, queryValue);
-                // return "dfdfdfdf";
-
-                
-
-
-
-
-
-                
-
-
-                // 그룹이름잉 없으면 봉사 그룹 신청인원에 따라 10개 반환하기
+                // 그룹이름이 없으면 봉사 그룹 신청인원에 따라 10개 반환하기
                 if(!info.groupName) {
-                    const nullGroupNameSql = `select * from groupInfo left join on groupid = ? limit order by desc 0,10 ;`;
+                    const nullGroupNameSql = `select * from groupInfo order by applyPeopleNumber desc limit 0,5;`;
                     let nullGroupNameValue = [
-                        info.id
+                        info.groupName
                     ];
                     const nullGroupNameData = await pool.getData(nullGroupNameSql, nullGroupNameValue);
-
-                    console.log("조회된 아이디가 없을 경우 :::", nullGroupNameData);
+                    return nullGroupNameData[0];
                 }
 
-                // 조회된 아이디가 있을 경우
-                const nullGroupNameSql = `select * from groupInfo left join on groupid = ? limit order by desc 0,10 ;`;
-                let nullGroupNameValue = [
-                    info.id
+                // 조회된 아이디가 있을 경우 `%${area}%` : "%영등포구%"
+                let parserAddress = `%${info.groupName}%`;
+                const lookUpGroupNameSql = "select * from groupInfo where groupName like ? limit 0, 10";
+                // const sql = "select * from volunteerInfo where progrmBeginDate >= ? and progrmEndDate <= ? and postAdres like ? limit ? , 5;";
+
+                let lookUpGroupNameValue = [
+                    parserAddress
                 ];
-                const nullGroupNameData = await pool.getData(nullGroupNameSql, nullGroupNameValue);
 
-                console.log("조회된 아이디가 없을 경우 :::", nullGroupNameData);
+                const lookUpGroupNameResult = await pool.getData(lookUpGroupNameSql, lookUpGroupNameValue);
 
-
-                // 봉사 그룹 타입으로 반환을 해야한다.
-                // 배열로 봉사정보를 리턴한다.
+                console.log("조회된 아이디가 없을 경우 :::", lookUpGroupNameResult[0]);
+                return lookUpGroupNameResult[0];
 
             } catch (err) {
                 console.log("그룹 조회 에러 :::", err);
-                return err;
+                return new ApolloError("그룹 조회 에러입니다.");
             }
         }
     }

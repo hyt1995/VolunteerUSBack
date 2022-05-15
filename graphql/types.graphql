@@ -30,3 +30,14 @@ type User {
         adultPossible : Int
         groupPossible : Int
     }
+
+
+    type GroupLookUp {
+        groupName : String
+        representName : String
+        limitPeople : Int
+        groupGreeting : String
+        groupExplain : String
+        userId : Int
+        applyPeopleNumber : Int
+    }
