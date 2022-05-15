@@ -23,7 +23,7 @@ module.exports = {
                 transPassword = crypto.createHash('sha512').update(password).digest('base64');
 
                 // 아이디 비번일 맞을 경우
-                const sql = `SELECT id FROM users WHERE userId = ? AND password= ?;`;
+                const sql = `SELECT id, userName FROM users WHERE userId = ? AND password= ?;`;
 
                 let queryValue = [
                     id,
@@ -38,6 +38,7 @@ module.exports = {
                         message: "id",
                       });
                 };
+                console.log("유저 정보 확인 :::", resultLogin[0][0]);
 
                 let authToken = auth.authToken.member.set({
                     weatherMerber : true,
@@ -45,7 +46,11 @@ module.exports = {
                     loginId : id
                 });
                 
-                return authToken;
+                return {
+                    token : authToken,
+                    id : id,
+                    userName : resultLogin[0][0].userName
+                };
 
             } catch( err ) {
                 console.log("여기서 에러 발생");
