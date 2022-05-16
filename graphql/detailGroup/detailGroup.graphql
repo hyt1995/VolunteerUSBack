@@ -1,0 +1,3 @@
+type Query {
+  detailGroup(groupName: String!): groupDetailInfo
+}
