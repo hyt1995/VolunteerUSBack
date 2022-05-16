@@ -32,6 +32,7 @@ type InfoVolunteer {
 }
 
 type GroupLookUp {
+  id: Int
   groupName: String
   representName: String
   limitPeople: Int
@@ -55,4 +56,6 @@ type groupDetailInfo {
   groupExplain: String
   applyPeopleNumber: Int
   openChatUrl: String
+  applyUserId: Int
+  applyGroupId: Int
 }

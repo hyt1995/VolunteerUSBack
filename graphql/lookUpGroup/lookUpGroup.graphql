@@ -1,5 +1,3 @@
 type Query {
-    lookUpGroup(
-        groupName : String
-    ):[GroupLookUp]
+  lookUpGroup(groupName: String): [GroupLookUp]
 }

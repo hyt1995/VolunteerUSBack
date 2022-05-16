@@ -9,9 +9,9 @@ module.exports = {
     detailGroup: async (_, info) => {
       try {
         // 그룹 이름이 안들어왔을 경우
-        if (!info.groupName) {
+        if (!info.groupId) {
           throw new ApolloError(
-            "그룹이름이 넘어오지 않았습니다.",
+            "그룹아이디가 넘어오지 않았습니다.",
             "이상한 아이디",
             {
               message: "id",
@@ -19,9 +19,9 @@ module.exports = {
           );
         }
 
-        const groupDetailSql = `select * from groupInfo left join groupApply on applyGroupId = 1 where groupInfo.id = 1`;
+        const groupDetailSql = `select * from groupInfo left join groupApply on applyGroupId = ? where groupInfo.id = ?`;
 
-        let groupDetailValue = [info.groupName];
+        let groupDetailValue = [info.groupId, info.groupId];
 
         const groupDetailValueResult = await pool.getData(
           groupDetailSql,
@@ -33,7 +33,7 @@ module.exports = {
           groupDetailValueResult[0]
         );
 
-        return groupDetailValueResult[0][0];
+        return groupDetailValueResult[0];
       } catch (err) {
         console.log("여기서 그룹 상세조회 에러 ::::", err);
         return err;
