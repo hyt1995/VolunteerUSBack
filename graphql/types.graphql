@@ -58,4 +58,7 @@ type groupDetailInfo {
   openChatUrl: String
   applyUserId: Int
   applyGroupId: Int
+  birthday: String
+  gender: Boolean
+  countAge: Int
 }
