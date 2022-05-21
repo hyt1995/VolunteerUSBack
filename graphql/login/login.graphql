@@ -1,6 +1,3 @@
 type Query {
-    login(
-        id:String! 
-        password:String!
-    ) : Login
+  login(id: String!, password: String!): Login!
 }

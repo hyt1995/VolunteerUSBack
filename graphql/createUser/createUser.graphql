@@ -1,11 +1,11 @@
 type Mutation {
-    createUser ( 
-        id : String! 
-        userName : String!
-        password : String
-        gender : Boolean
-        birthday : String
-        phone : String!
-        address : String
-    ) : Boolean!
+  createUser(
+    id: String!
+    userName: String!
+    password: String
+    gender: Boolean
+    birthday: String
+    phone: String!
+    address: String
+  ): Boolean!
 }

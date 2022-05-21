@@ -1,3 +1,7 @@
 type Query {
-  lookUpGroup(groupName: String): [GroupLookUp]
+  lookUpGroup(
+    groupName: String
+    searchAddress: String
+    pageNum: Int
+  ): [GroupLookUp]
 }

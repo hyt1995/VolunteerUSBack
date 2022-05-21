@@ -1,6 +1,7 @@
 const { ApolloError } = require("apollo-server-errors");
 const pool = require("../../module/mysql2");
 const date = require("date-and-time");
+const errorList = require("../../module/errorList");
 
 module.exports = {
   Query: {
@@ -25,13 +26,7 @@ module.exports = {
         } else {
           // 20220507 형식이 아닐경우 빈배열을 보내준다.
           if (!info.progrmBeginDate.length === 8) {
-            throw new ApolloError(
-              "날짜 형식을 다시 확인해주세요",
-              "이상한 아이디",
-              {
-                message: "id",
-              }
-            );
+            return errorList.returnError("날짜형식을 다시 확인해주세요", 400);
           }
           // 들어온값을 넣어준다.
           whereQuery = `progrmEndDate > ${info.progrmBeginDate}`;

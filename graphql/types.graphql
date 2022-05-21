@@ -56,6 +56,7 @@ type groupDetailInfo {
   groupExplain: String
   applyPeopleNumber: Int
   openChatUrl: String
+  addressGroupInfo: String
   applyUserId: Int
   applyGroupId: Int
   birthday: String

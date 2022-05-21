@@ -1,9 +1,10 @@
 type Mutation {
-    groupApply (
-        groupName : String!
-        repreName : String!
-        limit : Int!
-        groupGreeting : String!
-        groupExplane : String!
-    ):Boolean!
+  groupApply(
+    groupName: String!
+    limit: Int!
+    groupGreeting: String!
+    groupExplane: String!
+    AddressGroup: String
+    openChatUrl: String
+  ): Boolean!
 }
