@@ -10,7 +10,7 @@ module.exports = {
       try {
         // id가 안들어왔을 경우
         if (!info.token) {
-          return errorList.returnError("토큰을 확인해주세요", 400);
+          throw new ApolloError("10005");
         }
 
         const kakaRestId = "e98a98f979b43a08c0756c1590d4f028";
@@ -83,6 +83,7 @@ module.exports = {
         };
       } catch (err) {
         console.log("카카오로그인 에러 ::::", err);
+        throw new ApolloError(err["message"], err["message"]);
       }
     },
   },

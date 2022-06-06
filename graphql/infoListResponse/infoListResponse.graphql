@@ -1,11 +1,11 @@
 type Query {
-    infoListResponse(
-            progrmBeginDate : String
-            postAdres : String
-            progrmTitle : String
-            teenPossible : Boolean
-            adultPossible : Boolean
-            groupPossible : Boolean
-            pageNumber : Int
-        ) : [InfoVolunteer]
+  infoListResponse(
+    progrmBeginDate: String
+    postAdres: String
+    progrmTitle: String
+    teenPossible: Boolean
+    adultPossible: Boolean
+    groupPossible: Boolean
+    pageNumber: Int
+  ): [InfoVolunteer]
 }

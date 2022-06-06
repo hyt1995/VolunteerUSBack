@@ -1,3 +1,3 @@
 type Query {
-  loginTokenAuth(token: String): Login!
+  loginTokenAuth: Login!
 }

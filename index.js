@@ -9,6 +9,9 @@ const { bodyParserGraphQL } = require("body-parser-graphql");
 const { ApolloServer, gql } = require("apollo-server-express");
 const { execute, subscribe } = require("graphql");
 const schema = require("./schema");
+const errList = require("./module/errorList");
+const auth = require("./module/auth");
+const { ApolloError } = require("apollo-server-errors");
 const expressPlayground =
   require("graphql-playground-middleware-express").default;
 
@@ -35,15 +38,36 @@ const server = new ApolloServer({
   csrfPrevention: true,
   introspection: true,
   context: async ({ req }) => {
-    return req.headers;
+    if (req.headers.token) {
+      const result = auth.authToken.get(req.headers.token);
+      // if (!result) {
+      //   throw new ApolloError("10006", "10006");
+      // }
+      return {
+        token: req.headers.token,
+        data: result,
+      };
+    }
+    return false;
   },
   formatError: (err) => {
-    // 에러가 날경우 에러를 리턴 타입과 다르게 보내기 위해 에러 형식을 지정하는 곳입니다.
-    // Don't give the specific errors to the client.
-    if (err.message.startsWith("Database Error: ")) {
-      return new Error("Internal server error");
+    if (err.path) {
+      if (!Number(err.message)) {
+        return {
+          code: "10003",
+          message: errList["10003"].knMessage,
+        };
+      }
+      return {
+        code: String(err.extensions.code),
+        message: errList[String(err.extensions.code)].knMessage,
+      };
     }
-    return err;
+    // 정의되지 않은 에러
+    return {
+      code: String(err.extensions.code),
+      message: errList[String(err.extensions.code)].knMessage,
+    };
   },
 });
 

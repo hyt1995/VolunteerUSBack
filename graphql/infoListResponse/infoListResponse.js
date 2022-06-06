@@ -1,7 +1,6 @@
 const { ApolloError } = require("apollo-server-errors");
 const pool = require("../../module/mysql2");
 const date = require("date-and-time");
-const errorList = require("../../module/errorList");
 
 module.exports = {
   Query: {
@@ -23,11 +22,10 @@ module.exports = {
         if (!info.progrmBeginDate) {
           const day = date.format(new Date(), "YYYYMMDD");
           whereQuery = `progrmEndDate > ${day}`;
-        } else {
+        } else if (info.progrmBeginDate.length !== 8) {
           // 20220507 형식이 아닐경우 빈배열을 보내준다.
-          if (!info.progrmBeginDate.length === 8) {
-            return errorList.returnError("날짜형식을 다시 확인해주세요", 400);
-          }
+          throw new ApolloError("10005");
+        } else {
           // 들어온값을 넣어준다.
           whereQuery = `progrmEndDate > ${info.progrmBeginDate}`;
         }
@@ -46,7 +44,6 @@ module.exports = {
           }
           // 나머지 모집 대상값이 들어왔을 경우
           else if (info[arrayValue]) {
-            console.log("뭐가 들어오는지 :::", arrayValue, info[arrayValue]);
             whereQuery += ` and ${arrayValue} = ${info[arrayValue]}`;
           }
         }
@@ -62,11 +59,10 @@ module.exports = {
 
         const result = await pool.getData(sql, queryValue);
 
-        console.log("결과값도 같이 ::::", result[0]);
         return result[0];
       } catch (err) {
         console.log("여기서 에러 발생 :::", err);
-        return err;
+        throw new ApolloError(err["message"], err["message"]);
       }
     },
   },

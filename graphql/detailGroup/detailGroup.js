@@ -1,15 +1,14 @@
 const { ApolloError } = require("apollo-server-errors");
 const pool = require("../../module/mysql2");
-const errorList = require("../../module/errorList");
 
 // 그룹상세조회 페이지
 module.exports = {
   Query: {
     detailGroup: async (_, info) => {
       try {
-        // 그룹 이름이 안들어왔을 경우
+        // 그룹 아이디가 안들어왔을 경우
         if (!info.groupId) {
-          return errorList.returnError("정보를 다시 확인해주세요", 403);
+          throw new ApolloError("10005");
         }
 
         // 그룹에 대한 자세한 설명과 그 그룹 소속 유저들 생년월일과 성별을 불러온다.
@@ -52,7 +51,7 @@ module.exports = {
         return context;
       } catch (err) {
         console.log("여기서 그룹 상세조회 에러 ::::", err);
-        return err;
+        throw new ApolloError(err["message"], err["message"]);
       }
     },
   },

@@ -33,9 +33,9 @@ const lookUpApi = async () => {
     // const endNumber = today !== 7 ?  numberRow * today : numberRow * today + 7
 
     // for 문 시작
-    const startNumber = 200;
+    const startNumber = 13;
     // for 문 종료
-    const endNumber = 210;
+    const endNumber = 20;
 
     for (let d = startNumber; d <= endNumber; d++) {
       // 숫자가 넘어가면 에러 처링
@@ -51,6 +51,7 @@ const lookUpApi = async () => {
         console.log("아무것도 들어온게 없습니다.!!!!!!", listDateData);
         return;
       }
+      ``;
 
       // 상세정보 조회를 위한 리스트 저장 배열
       let returnJson = [];
@@ -59,13 +60,42 @@ const lookUpApi = async () => {
       for (let n = 0; n < listDateData.length; n++) {
         let progrmRegistNo = String(listDateData[n].progrmRegistNo);
 
-        // 등록번호로 자세한 내용 가져오기     2826302
+        // 등록번호로 자세한 내용 가져오기
         const resultDetailInfo = await axios.get(
           `http://openapi.1365.go.kr/openapi/service/rest/VolunteerPartcptnService/getVltrPartcptnItem?serviceKey=${encodingKey}&progrmRegistNo=${progrmRegistNo}`
         );
         const detailData = await resultDetailInfo.data.response.body.items.item;
 
+        // many connect를 위한 현재 끊김을 알아보기 위한
         console.log("봉사 상세 정보 조회 확인 ::::", detailData);
+        console.log("데이터 끊기기전 페이지 넘버 받아오기 ::::", d);
+
+        // 모집기관 아이디를 저장하기 전에 존재여부 확인
+        const resultLookUpAgency = await lookupAgency(detailData.mnnstNm);
+
+        console.log("모집기관 기존 존재여부 확인 ::::", resultLookUpAgency[0]);
+
+        // 모집기관이 저장이 안되있을 경우 저장하고 아이디를 객체에 저장한다
+        if (!resultLookUpAgency[0][0]) {
+          // 여기서 모집기관을 우선 저장하고
+          const firstSaveAgencyId = await agencyForSaveId(detailData.mnnstNm);
+
+          console.log(
+            "여기서 모집기관 저장 아이디 받아오기 ::::",
+            firstSaveAgencyId[0].insertId
+          );
+
+          console.log(
+            "여기서 모집기관 이름 새로저장 결과 :::",
+            firstSaveAgencyId[0]
+          );
+
+          // 저장한 모집기관 아이디 봉사상세정보 객체에 저장
+          detailData.mnnstNmId = firstSaveAgencyId[0].insertId;
+        } else {
+          // 기존에 모집기관이 저장이 되있는 경우 객체에 저장
+          detailData.mnnstNmId = resultLookUpAgency[0][0].id;
+        }
 
         // 청소년 가능
         detailData.teenPossible =
@@ -115,6 +145,25 @@ const lookUpApi = async () => {
   }
 };
 
+// 기존에 모집기관이 존재하고 있는지 조회 후 저장
+const lookupAgency = async (name) => {
+  const sql = `select id from recruitAgency where mnnstNm = ?`;
+
+  let queryValue = [`${name}`];
+
+  return await pool.getData(sql, queryValue);
+};
+
+// 모집기관을 저장하고 아이디를 받아오기위한
+const agencyForSaveId = async (name) => {
+  //on duplicate key update ${updateStrQuery}
+  const sql = `insert into recruitAgency (mnnstNm) values (?);`;
+
+  let queryValue = [name];
+
+  return await pool.getData(sql, queryValue);
+};
+
 // api조회 후 db에 저장하기
 const modelLookUpApi = async (obj) => {
   // 데이터베이스 테이블 컬럼 확인하기
@@ -129,7 +178,7 @@ const modelLookUpApi = async (obj) => {
     "noticeEnd", // 모집 종료일
     "recruitNunber", // 모집인원
     "srvcClcode", // 봉사분야
-    "mnnstNm", // 모집기관(주관기관명)
+    "mnnstNmId", // 모집기관(주관기관명)
     "postAdres", // 주소
     "adminName", // 관리자 이름
     "email", // 이메일
@@ -152,7 +201,7 @@ const modelLookUpApi = async (obj) => {
     String(obj.noticeEndde),
     Number(obj.rcritNmpr),
     String(obj.srvcClCode),
-    String(obj.mnnstNm),
+    String(obj.mnnstNmId),
     String(obj.postAdres),
     String(obj.nanmmbyNmAdmn),
     String(obj.email),
@@ -268,3 +317,5 @@ const infoCount = async (req, res) => {
 module.exports = {
   lookUpApi,
 };
+
+// 기타 > 기타

@@ -20,7 +20,7 @@ module.exports = {
           return nullGroupNameData[0];
         }
 
-        // 그룹이름이 들어왔을 경우 `%${area}%` : "%영등포구%" 페이지 네이션 기능 추가
+        // 그룹이름이 들어왔을 경우 `%${area}%` : "%그룹이름%" 페이지 네이션 기능 추가
         let parserNameSearch = info.groupName ? `%${info.groupName}%` : "%";
         // 그룹 이름 주소 검색일 경우
         let searchAddress = info.searchAddress

@@ -63,3 +63,26 @@ type groupDetailInfo {
   gender: Boolean
   countAge: Int
 }
+
+type detailInfoType {
+  registNo: String
+  progrmTitle: String!
+  progrmBeginDate: String!
+  progrmEndDate: String!
+  actBeginTm: String!
+  actEndTm: String!
+  recruitNunber: Int!
+  srvcClcode: String!
+  postAdres: String!
+  adminName: String!
+  email: String!
+  progrmExpl: String!
+  telNo: String!
+  actWkdy: String!
+  noticeBegin: String!
+  noticeEnd: String!
+  teenPossible: Int!
+  adultPossible: Int!
+  groupPossible: Int!
+  mnnstNmId: Int!
+}

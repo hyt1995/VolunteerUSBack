@@ -32,7 +32,6 @@ const authToken = {
       // const secret = req.app.get("jwt-secret");
       const secret = config.jwt_secret;
       const decode = jwt.verify(token, secret);
-      console.log("토큰 시크릿 키 확인 :::", config.jwt_secret, decode);
       return decode;
     } catch (err) {
       return false;

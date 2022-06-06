@@ -6,20 +6,17 @@ module.exports = {
   Query: {
     loginTokenAuth: async (_, info, context) => {
       try {
-        const user = auth.authToken.get(context.token);
-
-        if (user === false) {
-          return errorList.returnError("유효한 토큰이 아닙니다.", 403);
+        // 토큰이 유효하지 않을 경우
+        if (!context.data) {
+          throw new ApolloError("10006");
         }
-
         return {
           token: context.token,
-          userName: user.userName,
-          id: user.loginId,
+          userName: context.data.userName,
+          id: context.data.loginId,
         };
       } catch (err) {
-        console.log("토큰 로그인 에러 ::::", err);
-        return err;
+        throw new ApolloError(err["message"], err["message"]);
       }
     },
   },
