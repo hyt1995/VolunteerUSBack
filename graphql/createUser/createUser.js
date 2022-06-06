@@ -7,6 +7,7 @@ module.exports = {
   Mutation: {
     createUser: async (_, info) => {
       try {
+        console.log("회원ㄱ아입 정보 홗인 :::", info);
         // 받아온 정보가 부족할 때
         if (!info.id || !info.userName || !info.phone) {
           throw new ApolloError("10005");
@@ -27,9 +28,6 @@ module.exports = {
 
         // 생년월일
         birthday = info.birthday ? String(info.birthday) : "null";
-        if (birthday !== "null" || birthday.length !== 8) {
-          throw new ApolloError("10005");
-        }
 
         // 주소를 분할을 해야한디 - 수정 - 한형님과의 논의
         address = info.address ? info.address : "null";

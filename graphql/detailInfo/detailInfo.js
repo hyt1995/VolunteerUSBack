@@ -58,11 +58,29 @@ module.exports = {
            where registNo = ?;`;
         const commentValue = [
           info.registNo,
-          // pageNum   limit ? , 10x
+          // pageNum   limit ? , 10\]
         ];
 
         const commentResult = await pool.getData(commentSql, commentValue);
         console.log("봉사 상세 comment!!! :::", commentResult[0]);
+
+        // const resultGroupFor = commentResult[0].map((i)=>{
+        //   if()
+        // })
+
+        const groupSql = `select mnnstNmId, commentText, createdAtComText, userName, applyUserId, applyGroupId from volunteerInfo
+           left join comment on agencyId = mnnstNmId 
+           left join users on users.id = writeUserId 
+           left join (select * from groupApply) groupApply on applyUserId = writeUserId
+           where registNo = ?;`;
+        const groupValue = [
+          info.registNo,
+          // pageNum   limit ? , 10\]
+        ];
+
+        const groupResult = await pool.getData(groupSql, groupValue);
+
+        console.log("그룹 가져오기 위한 :::", groupResult);
 
         // const commentResultValue = await commentResult[0].map((i) => {
         //   if (i.id) return i;
